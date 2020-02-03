@@ -1,48 +1,21 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
     app = express();
-
+var {AddItem,getItems,updateItem,deleteItem} = require("./customers/customers.controller")
+var db = require('mongoose')
+db.connect('mongodb+srv://omar:zBWusbyYPjOlBpia@cluster0-utyhh.mongodb.net/test?retryWrites=true&w=majority')
 app.use(bodyParser.urlencoded())
-var customers = [];
 
 app.get('/',(req, res)=>{  
    res.send('<h1> Hello World 2 </h1>');  
 });
 
-app.get('/customers',(req, res)=>{  
-   res.json(customers);  
-});
+app.get('/customers',getItems);
 
-app.post('/customers',(req, res)=>{  
-   const { name,phone,email,country} = req.body;
-   let newCustomer = {id:customers.length+1,name,phone,email,country}
-   customers.push(newCustomer)
-   res.json(newCustomer);
-});
+app.post('/customers',AddItem);
 
-app.put('/customers/:id',(req, res)=>{  
-   let id = req.params.id;
-   const { name,phone,email,country} = req.body;
-   let ind = customers.findIndex( x => x.id ==  id);
-   if(ind > -1){
-      let updatedCustomer = {id:ind+1,name,phone,email,country}
-      customers.splice(ind,1,updatedCustomer)
-      res.json({message:'customer successfully updated'});  
-   }else{
-      res.json({message:'customer not found'});  
-   }
-});
+app.put('/customers/:id',updateItem);
 
-app.delete('/customers/:id',(req, res)=>{  
-   let id = req.params.id;
-   let ind = customers.findIndex( x => x.id ==  id);
-   if(ind > -1){
-      customers.splice(ind,1)
-      res.json({message:'customer successfully deleted'});  
-   }else{
-      res.json({message:'customer not found'});  
-   }
-});
-
+app.delete('/customers/:id',deleteItem);
 
 app.listen('3000',() => {  console.log('server started on port 3000'); });
